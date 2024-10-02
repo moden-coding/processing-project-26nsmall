@@ -1,13 +1,12 @@
 import processing.core.*;
 import processing.sound.*;
 
-
-
 public class App extends PApplet {
     SoundFile file;
+    boolean SoundPlay = true;
     int GlobalTimer = 0;
-    int heresacolor = color(0, 255, 0);
-    int AproachRate = 3;
+    int heresacolor = color(255, 165, 0);
+    int AproachRate = 1;
     float CircleSize = 100;
     float bpm = 160;
     float fpb = 3600 / bpm;
@@ -24,6 +23,9 @@ public class App extends PApplet {
     int maximumCombo = 0;
     int mapCombo = 6;
     boolean notFailed = true;
+    boolean sliderClick = false;
+    float sliderMulti = 1;
+    boolean SliderActiveClick = false;
 
     public static void main(String[] args) {
         PApplet.main("App");
@@ -44,31 +46,97 @@ public class App extends PApplet {
     public void clickStuff() {
         if (CircleClick) {
             globalId++;
-            hp += 50;
-            if (hp >= 750) {
-                hp = 750;
-            }
+            if (hp < 750)
+                hp += Math.min(50, 750 - hp);
             combo++;
             score += 100 * combo;
             hits++;
             STUPIDBUGFIX = 0;
         }
+        if (sliderClick) {
+            sliderMulti = (float)3/2;
+            SliderActiveClick = true;
+        }
 
     }
 
     public void setup() {
+        file = new SoundFile(this, "GravityFalls.mp3");
 
     }
 
     public void settings() {
         size(1500, 750);
-        file = new SoundFile(this, "GravityFalls.mp3");
-        file.play();
+
+    }
+
+    public void SliderTime(float SpawnTime, float endtime, int xPosStart, int yPosStart, int xPosEnd, int yPosEnd,
+            int id) {
+
+        if (SpawnTime - GlobalTimer <= (100 / (float) AproachRate) && SpawnTime - GlobalTimer >= (fpb / 4)) {
+            fill(255);
+            line(xPosStart, yPosStart, xPosEnd, yPosEnd);
+            fill(255);
+            strokeWeight(10);
+            ellipse(xPosStart, yPosStart, ((CircleSize - (fpb / 8) + AproachRate * (SpawnTime - GlobalTimer))),
+                    ((CircleSize - (fpb / 8) + AproachRate * (SpawnTime - GlobalTimer))));
+        }
+        strokeWeight(4);
+        if (globalId < id) {
+            if ((SpawnTime - GlobalTimer) <= (fpb / 2) && endtime - GlobalTimer > 0) {
+                fill(255);
+                line(xPosStart, yPosStart, xPosEnd, yPosEnd);
+                fill(255, 165, 0);
+                if ((SpawnTime - GlobalTimer) <= 0) {
+                    ellipse(xPosStart + ((xPosEnd - xPosStart) * ((GlobalTimer - SpawnTime) / (endtime - SpawnTime))),
+                            yPosStart + ((yPosEnd - yPosStart) * ((GlobalTimer - SpawnTime) / (endtime - SpawnTime))),
+                            CircleSize * sliderMulti, CircleSize * sliderMulti);
+                } else {
+                    ellipse(xPosStart, yPosStart, CircleSize * sliderMulti, CircleSize * sliderMulti);
+
+                }
+
+            } else if ((SpawnTime - GlobalTimer) <= (2 * fpb / AproachRate) && endtime - GlobalTimer > 0) {
+                fill(255);
+                line(xPosStart, yPosStart, xPosEnd, yPosEnd);
+                fill(255, 0, 0);
+                ellipse(xPosStart, yPosStart, CircleSize, CircleSize);
+            }
+            if ((SpawnTime - GlobalTimer) <= (-fpb / 2) && sliderMulti != (float)3/2) {
+
+                fill(255, 0, 0);
+                text("MISS", 0, 70);
+                sliderMulti = 0;
+                if (endtime - GlobalTimer < -5) {
+                    globalId = id;
+                    hp -= 150;
+                    misses++;
+                    combo = 0;
+                    STUPIDBUGFIX = 0;
+                }
+            } else if (endtime - GlobalTimer <= fpb / 2 && sliderMulti == (float)3/2) {
+                fill(0, 255, 0);
+                text("HIT", 0, 120);
+                if (endtime - GlobalTimer < 1) {
+                    sliderMulti = 1;
+                    if (hp < 750)
+                        hp += Math.min(50, 750 - hp);
+                    combo++;
+                    score += 100 * combo;
+                    hits++;
+                    STUPIDBUGFIX = 0;
+                    globalId++;
+                }
+
+            }
+
+        }
 
     }
 
     public void CircleTime(float SpawnTime, int xLoc, int yLoc, int id) {
-        if (SpawnTime - GlobalTimer <= ((300 / ((float) 3 * AproachRate))) && SpawnTime - GlobalTimer >= (fpb / 4)) {
+
+        if (SpawnTime - GlobalTimer <= (100 / (float) AproachRate) && SpawnTime - GlobalTimer >= (fpb / 4)) {
             fill(255);
             strokeWeight(10);
             ellipse(xLoc, yLoc, ((CircleSize - (fpb / 8) + AproachRate * (SpawnTime - GlobalTimer))),
@@ -105,23 +173,32 @@ public class App extends PApplet {
     }
 
     public void draw() {
-
+        /*
+         * if (SoundPlay) {
+         * file.play();
+         * SoundPlay = false;
+         * }
+         */
         textSize(50);
         CircleClick = false;
+        sliderClick = false;
         background(255);
         GlobalTimer++;
         accuracy = (double) Math.round((100 - ((misses / ((double) (hits + misses + STUPIDBUGFIX))) * 100)) * 100d)
                 / 100d;
 
         if (hp > 0) {
+            SliderTime(fpb * (5), fpb * (12), 100, 100, 500, 500, 1);
 
-            CircleTime(fpb * (10), 100, 500, 6);
-            CircleTime(fpb * (9), 500, 100, 5);
-            CircleTime(fpb * (8), 100, 100, 4);
-            CircleTime(fpb * (7), 100, 500, 3);
-            CircleTime(fpb * (6), 500, 100, 2);
-            CircleTime(fpb * (5), 100, 100, 1);
-            fill(0);
+            /*
+             * CircleTime(fpb * (10), 100, 500, 6);
+             * CircleTime(fpb * (9), 500, 100, 5);
+             * CircleTime(fpb * (8), 100, 100, 4);
+             * CircleTime(fpb * (7), 100, 500, 3);
+             * CircleTime(fpb * (6), 500, 100, 2);
+             * CircleTime(fpb * (5), 100, 100, 1);
+             * fill(0);
+             */
 
         } else {
             notFailed = false;
@@ -137,6 +214,13 @@ public class App extends PApplet {
 
         if (get(mouseX, mouseY) == -16711936) {
             CircleClick = true;
+        }
+        if (get(mouseX, mouseY) == -23296) {
+            sliderClick = true;
+        }
+        if (get(mouseX, mouseY) != -23296 && SliderActiveClick) {
+            SliderActiveClick = false;
+            sliderMulti = 0;
         }
 
         if (GlobalTimer > 500 && notFailed) {
@@ -180,6 +264,35 @@ public class App extends PApplet {
 
     public void mousePressed() {
         clickStuff();
+    }
+
+    public void mouseReleased() {
+        if (sliderClick) {
+            sliderMulti = 1;
+        }
+
+    }
+
+    public void keyReleased() {
+        if (key == 'z') {
+            if (sliderClick) {
+                sliderMulti = 1;
+            }
+        }
+
+        if (key == 'x') {
+            if (sliderClick) {
+                sliderMulti = 1;
+            }
+
+        }
+        if (key == CODED) {
+            if (keyCode == UP) {
+                if (sliderClick) {
+                    sliderMulti = 1;
+                }
+            }
+        }
     }
 
     public void keyPressed() {
