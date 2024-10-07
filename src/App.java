@@ -6,9 +6,9 @@ public class App extends PApplet {
     boolean SoundPlay = true;
     int GlobalTimer = 0;
     int heresacolor = color(255, 165, 0);
-    int AproachRate = 1;
+    int AproachRate = 2;
     float CircleSize = 100;
-    float bpm = 160;
+    float bpm = 80;
     float fpb = 3600 / bpm;
     int globalId = 0;
     boolean CircleClick = false;
@@ -54,7 +54,7 @@ public class App extends PApplet {
             STUPIDBUGFIX = 0;
         }
         if (sliderClick) {
-            sliderMulti = (float)3/2;
+            sliderMulti = (float) 3 / 2;
             SliderActiveClick = true;
         }
 
@@ -102,7 +102,7 @@ public class App extends PApplet {
                 fill(255, 0, 0);
                 ellipse(xPosStart, yPosStart, CircleSize, CircleSize);
             }
-            if ((SpawnTime - GlobalTimer) <= (-fpb / 2) && sliderMulti != (float)3/2) {
+            if ((SpawnTime - GlobalTimer) <= (-fpb / 2) && sliderMulti != (float) 3 / 2) {
 
                 fill(255, 0, 0);
                 text("MISS", 0, 70);
@@ -114,7 +114,7 @@ public class App extends PApplet {
                     combo = 0;
                     STUPIDBUGFIX = 0;
                 }
-            } else if (endtime - GlobalTimer <= fpb / 2 && sliderMulti == (float)3/2) {
+            } else if (endtime - GlobalTimer <= fpb / 2 && sliderMulti == (float) 3 / 2) {
                 fill(0, 255, 0);
                 text("HIT", 0, 120);
                 if (endtime - GlobalTimer < 1) {
@@ -173,12 +173,12 @@ public class App extends PApplet {
     }
 
     public void draw() {
-        /*
-         * if (SoundPlay) {
-         * file.play();
-         * SoundPlay = false;
-         * }
-         */
+        
+          if (SoundPlay) {
+          file.play();
+          SoundPlay = false;
+          }
+         
         textSize(50);
         CircleClick = false;
         sliderClick = false;
@@ -188,17 +188,17 @@ public class App extends PApplet {
                 / 100d;
 
         if (hp > 0) {
-            SliderTime(fpb * (5), fpb * (12), 100, 100, 500, 500, 1);
+           // SliderTime(fpb * (5), fpb * (12), 100, 100, 500, 550, 1);
 
-            /*
-             * CircleTime(fpb * (10), 100, 500, 6);
-             * CircleTime(fpb * (9), 500, 100, 5);
-             * CircleTime(fpb * (8), 100, 100, 4);
-             * CircleTime(fpb * (7), 100, 500, 3);
-             * CircleTime(fpb * (6), 500, 100, 2);
-             * CircleTime(fpb * (5), 100, 100, 1);
-             * fill(0);
-             */
+            
+              CircleTime(fpb * (10), 100, 500, 6);
+              CircleTime(fpb * (9), 500, 100, 5);
+              CircleTime(fpb * (8), 100, 100, 4);
+              CircleTime(fpb * (7), 100, 500, 3);
+              CircleTime(fpb * (6), 500, 100, 2);
+              CircleTime(fpb * (5), 100, 100, 1);
+              fill(0);
+             
 
         } else {
             notFailed = false;
@@ -223,7 +223,7 @@ public class App extends PApplet {
             sliderMulti = 0;
         }
 
-        if (GlobalTimer > 500 && notFailed) {
+        if (GlobalTimer > fpb*13 && notFailed) {
             textSize(100);
             if (misses == 0) {
                 fill(0, 255, 0);
@@ -273,7 +273,7 @@ public class App extends PApplet {
 
     }
 
-    public void keyReleased() {
+   /*  public void keyReleased() {
         if (key == 'z') {
             if (sliderClick) {
                 sliderMulti = 1;
@@ -293,11 +293,12 @@ public class App extends PApplet {
                 }
             }
         }
-    }
+    }*/
 
     public void keyPressed() {
         if (key == 'z') {
             clickStuff();
+            
 
         }
 
