@@ -26,8 +26,7 @@ public class App extends PApplet {
     int misses = 0;
     int combo = 0;
     int hits = 0;
-    // fixes a nan bug and this was the best thing i could thing of so this is kinda
-    // dumb.
+    // fixes a nan bug and this was the best thing i could thing of so this is dumb.
     int STUPIDBUGFIX = 1;
     double accuracy = 100 - ((misses / (hits + misses + STUPIDBUGFIX)) * 100);
     int maximumCombo = 0;
@@ -40,26 +39,44 @@ public class App extends PApplet {
     float sliderMulti = 1;
     // handles if a slider is being clicked.
     boolean SliderActiveClick = false;
-    boolean GravityFallsMap = false;
+    // These variables check if a map is started and which map is staryed
+    boolean GravityFallsMapHard = false;
     boolean anyMapStarted = false;
+    boolean GravityFallsMapEasy = false;
 
     public static void main(String[] args) {
         PApplet.main("App");
 
     }
 
+    // this function handles drawing the menu before the game starts
     public void menu() {
         if (anyMapStarted == false) {
             if (InstructionsOnScreen == false) {
                 fill(255, 0, 0);
                 ellipse(1100, 375, 300, 300);
-            }
-            else{
-                textAlign(CENTER);;
+                fill(0, 255, 0);
+                ellipse(400, 375, 300, 300);
+                textAlign(CENTER);
+                fill(0);
+                textSize(100);
+                text("CLICK THE CIRCLES", 750, 100);
+                textSize(50);
+                text("EASY", 400, 400);
+                text("Hard", 1100, 400);
+                textAlign(LEFT);
+                text("Instructions", 850, 675);
+
+            } else {
+                fill(0);
+                textAlign(LEFT);
+                text("Back", 850, 675);
+                textAlign(CENTER);
                 text("Instructions", 750, 50);
                 textAlign(LEFT);
                 textSize(35);
-                text("In clicking the circles your goal is to click every single circle that you see the beat. You will see 2 different types of circles. First hit circles. These circles are stationary and have a ring that closes in around them. When the ring meets the edge of the circle the circle will turn from red to green. That is your que to click it. The other type of circle are the sliding circles. These circles move when you click them. Instead of turning green they turn orange. You must press and hold on them and keep your mouse on the circle as it moves along the line. You can click with your mouse or use the z and x keys on your keyboard. If you miss too many circles your hp will run out and you will die. Give it your best shot.", 25, 100, 1475, 725);
+                text("In clicking the circles your goal is to click every single circle that you see the beat. You will see two different types of circles. First hit circles. These circles are stationary and have a ring that closes in around them. When the ring meets the edge of the circle the circle will turn from red to green. That is your que to click it. The other type of circle are the sliding circles. These circles move when you click them. Instead of turning green they turn orange. You must press and hold on them and keep your mouse on the circle as it moves along the line. You can click with your mouse or use the z and x keys on your keyboard. If you miss too many circles your hp will run out and you will die. Give it your best shot.",
+                        25, 100, 1475, 725);
                 textSize(50);
 
             }
@@ -68,27 +85,28 @@ public class App extends PApplet {
         }
     }
 
-    // handles winning
+    // handles printing certain values when winning
     public void WIN() {
         fill(0);
         textAlign(CENTER);
         text((int) (score * AproachRate * (100 / CircleSize) * (bpm / 200)), 750, 150);
         textAlign(LEFT);
         text(Double.toString(accuracy) + "%", 150, 600);
-       
+
         text(Integer.toString(maximumCombo) + "/" + Integer.toString(mapCombo), 1000, 600);
-     
+
         fill(-16711936);
         text(hits, 300, 375);
         fill(255, 0, 0);
         text(misses, 1200, 375);
     }
 
+    // simple function that checks mouse distance to an object
     public double mouseDistance(int objectx, int objecty) {
         return Math.sqrt(Math.pow((mouseX - objectx), 2) + Math.pow((mouseY - objecty), 2));
     }
 
-    // handles events based on clicking
+    // handles the events that need to happen when circles or sliders are clicked
     public void clickStuff() {
         if (CircleClick) {
             globalId++;
@@ -106,7 +124,7 @@ public class App extends PApplet {
 
     }
 
-    // multiplies beat number by fpb for simplicity sake
+    // multiplies beat number by fpb for simplicity sake when programming the maps
     public float beatTime(float beat) {
 
         return (float) fpb * beat;
@@ -214,6 +232,7 @@ public class App extends PApplet {
             ellipse(xLoc, yLoc, CircleSize, CircleSize);
 
         }
+        // handles missing a circle
         if (GlobalTimer - SpawnTime > (fpb / 2) && globalId - id == -1) {
             fill(255, 0, 0);
             text("MISS", 0, 70);
@@ -225,6 +244,7 @@ public class App extends PApplet {
                 STUPIDBUGFIX = 0;
             }
 
+            // handles hitting a circle
         } else if (globalId == id && GlobalTimer - SpawnTime < (fpb / 2)) {
             fill(0, 255, 0);
             text("HIT", 0, 120);
@@ -232,6 +252,7 @@ public class App extends PApplet {
 
     }
 
+    // a function containg a pattern used in the hard map multiple times
     public void GravityFallsJumpPattern(float startTime, int startid) {
         CircleTime(beatTime(startTime + 6), 300, 300, startid + 7);
         CircleTime(beatTime(startTime + 5), 400, 600, startid + 6);
@@ -243,14 +264,19 @@ public class App extends PApplet {
         CircleTime(beatTime(startTime), 1000, 600, startid);
     }
 
-    public void GravityFalls() {
-        if (GravityFallsMap) {
+    // a function containg the hard map
+    public void GravityFallsHard() {
+
+        if (GravityFallsMapHard) {
+            // starts the music
             if (GlobalTimer >= beatTime(2)) {
                 if (SoundPlay) {
                     GravityFalls.play();
                     SoundPlay = false;
                 }
             }
+            // contains the actaul circles of the map with each individual time and location
+            // being hard coded
             if (hp > 0) {
                 CircleTime(beatTime(104), 750, 325, 91);
                 SliderTime(beatTime(100), beatTime(103.5f), 100, 100, 1400, 650, 90);
@@ -265,10 +291,10 @@ public class App extends PApplet {
                 CircleTime(beatTime(79), 100, 650, 74);
                 CircleTime(beatTime(78), 750, 650, 73);
                 CircleTime(beatTime(77), 1400, 650, 72);
-                CircleTime(beatTime(76), 1400, 200, 71);
-                CircleTime(beatTime(75), 750, 200, 70);
-                CircleTime(beatTime(74), 100, 200, 69);
-                GravityFallsJumpPattern(66, 61);
+                CircleTime(beatTime(75.5f), 1400, 200, 71);
+                CircleTime(beatTime(74.5f), 750, 200, 70);
+                CircleTime(beatTime(73.5f), 100, 200, 69);
+                GravityFallsJumpPattern(65.5f, 61);
                 CircleTime(beatTime(64), 1000, 300, 60);
                 CircleTime(beatTime(63), 900, 600, 59);
                 CircleTime(beatTime(62), 800, 400, 58);
@@ -328,11 +354,106 @@ public class App extends PApplet {
         }
     }
 
+    // contains the easy map
+    public void GravityFallsMapEasy() {
+        if (GravityFallsMapEasy) {
+            // starts the music
+            if (GlobalTimer >= beatTime(2)) {
+                if (SoundPlay) {
+                    GravityFalls.play();
+                    SoundPlay = false;
+                }
+            }
+            // contains the actaul circles of the map with each individual time and location
+            // being hard coded
+            if (hp > 0) {
+                CircleTime(beatTime(105), 750, 325, 73);
+                CircleTime(beatTime(103.5f), 750, 325, 72);
+                CircleTime(beatTime(103), 750, 325, 71);
+                CircleTime(beatTime(102.5f), 750, 325, 70);
+                CircleTime(beatTime(102), 750, 325, 69);
+                CircleTime(beatTime(101.5f), 750, 325, 68);
+                CircleTime(beatTime(101), 750, 325, 67);
+                CircleTime(beatTime(100.5f), 750, 325, 66);
+                CircleTime(beatTime(100), 750, 325, 65);
+                SliderTime(beatTime(98), beatTime(99), 750, 425, 750, 325, 64);
+                SliderTime(beatTime(96), beatTime(97), 750, 225, 750, 325, 63);
+                SliderTime(beatTime(94), beatTime(95), 650, 325, 750, 325, 62);
+                SliderTime(beatTime(92), beatTime(93), 850, 325, 750, 325, 61);
+                CircleTime(beatTime(91), 650, 325, 60);
+                CircleTime(beatTime(90), 850, 425, 59);
+                CircleTime(beatTime(89), 650, 225, 58);
+                CircleTime(beatTime(87), 750, 325, 57);
+                CircleTime(beatTime(86), 850, 325, 56);
+                CircleTime(beatTime(85), 650, 325, 55);
+                CircleTime(beatTime(84), 850, 225, 54);
+                CircleTime(beatTime(83), 850, 425, 53);
+                CircleTime(beatTime(82), 650, 425, 52);
+                CircleTime(beatTime(81), 650, 225, 51);
+                CircleTime(beatTime(79), 750, 625, 50);
+                CircleTime(beatTime(78), 750, 625, 49);
+                CircleTime(beatTime(77), 750, 625, 48);
+                CircleTime(beatTime(75), 750, 125, 47);
+                CircleTime(beatTime(74), 750, 125, 46);
+                CircleTime(beatTime(73), 750, 125, 45);
+                CircleTime(beatTime(71.5f), 250, 425, 44);
+                CircleTime(beatTime(70.5f), 250, 525, 43);
+                CircleTime(beatTime(69.5f), 250, 625, 42);
+                CircleTime(beatTime(68.5f), 450, 625, 41);
+                CircleTime(beatTime(67.5f), 450, 525, 40);
+                CircleTime(beatTime(66.5f), 450, 425, 39);
+                CircleTime(beatTime(65.5f), 450, 325, 38);
+                CircleTime(beatTime(64.5f), 450, 325, 37);
+                CircleTime(beatTime(63), 450, 225, 36);
+                CircleTime(beatTime(62), 450, 125, 35);
+                CircleTime(beatTime(61), 650, 125, 34);
+                CircleTime(beatTime(60), 650, 225, 33);
+                CircleTime(beatTime(59), 650, 325, 32);
+                CircleTime(beatTime(58), 650, 425, 31);
+                CircleTime(beatTime(56), 650, 425, 30);
+                CircleTime(beatTime(55), 650, 525, 29);
+                CircleTime(beatTime(54), 650, 625, 28);
+                CircleTime(beatTime(53), 850, 625, 27);
+                CircleTime(beatTime(52), 850, 525, 26);
+                CircleTime(beatTime(51), 850, 425, 25);
+                CircleTime(beatTime(50), 850, 325, 24);
+                SliderTime(beatTime(47), beatTime(48), 850, 125, 850, 325, 23);
+                SliderTime(beatTime(45), beatTime(46), 650, 125, 850, 125, 22);
+                SliderTime(beatTime(43), beatTime(44), 650, 325, 650, 125, 21);
+                SliderTime(beatTime(41), beatTime(42), 450, 325, 650, 325, 20);
+                SliderTime(beatTime(39), beatTime(40), 450, 125, 450, 325, 19);
+                SliderTime(beatTime(37), beatTime(38), 650, 125, 450, 125, 18);
+                CircleTime(beatTime(36), 650, 125, 17);
+                SliderTime(beatTime(34), beatTime(35), 650, 225, 650, 125, 16);
+                SliderTime(beatTime(30), beatTime(33), 650, 325, 850, 325, 15);
+                CircleTime(beatTime(29), 750, 425, 14);
+                CircleTime(beatTime(27.5f), 750, 325, 13);
+                CircleTime(beatTime(26), 750, 225, 12);
+                SliderTime(beatTime(22), beatTime(25), 850, 225, 650, 225, 11);
+                CircleTime(beatTime(21), 850, 225, 10);
+                SliderTime(beatTime(18), beatTime(20), 750, 325, 850, 325, 9);
+                CircleTime(beatTime(17), 750, 325, 8);
+                SliderTime(beatTime(14), beatTime(15), 750, 325, 840, 445, 7);
+                SliderTime(beatTime(12), beatTime(13), 750, 325, 750, 175, 6);
+                SliderTime(beatTime(10), beatTime(11), 750, 325, 660, 445, 5);
+                SliderTime(beatTime(8), beatTime(9), 750, 325, 840, 445, 4);
+                SliderTime(beatTime(6), beatTime(7), 750, 325, 750, 175, 3);
+                SliderTime(beatTime(4), beatTime(5), 750, 325, 660, 445, 2);
+                SliderTime(beatTime(2), beatTime(3), 750, 325, 840, 445, 1);
+            }
+        }
+
+    }
+
+    // Sets up things that need to happen at the beginning of every frame
     public void frameSetup() {
         if (anyMapStarted) {
+            // resets if something can be clicked
             CircleClick = false;
             sliderClick = false;
 
+            // increments the timer so that it increments by 60 every second using system
+            // time
             GlobalTimer += 60 * (millis() - previousFrameTime) / 1000f;
             previousFrameTime = millis();
 
@@ -342,9 +463,11 @@ public class App extends PApplet {
 
     }
 
+    // handles things that happen at the end of every frame
     public void endOfFrameUtils() {
         if (anyMapStarted) {
             fill(0);
+            // handles events that happen when you lose
             if (hp <= 0) {
                 GravityFalls.pause();
                 notFailed = false;
@@ -370,6 +493,7 @@ public class App extends PApplet {
                 sliderMulti = 0;
             }
 
+            // checks to see if you have won and prints values that hapen then.
             if (GlobalTimer > 60 * songLength && notFailed) {
                 textSize(100);
                 if (misses == 0) {
@@ -387,8 +511,9 @@ public class App extends PApplet {
                     textAlign(LEFT);
                     WIN();
 
-
                 }
+                // prints information such as hp and score for the player to see when they are
+                // playing
             } else if (notFailed) {
 
                 fill(0, 255, 0);
@@ -412,13 +537,14 @@ public class App extends PApplet {
         }
 
     }
-
+//main draw loop 
     public void draw() {
         textSize(50);
         background(255);
         menu();
         frameSetup();
-        GravityFalls();
+        GravityFallsMapEasy();
+        GravityFallsHard();
         endOfFrameUtils();
         // draws cursor
         fill(0, 0, 255);
@@ -426,15 +552,13 @@ public class App extends PApplet {
 
     }
 
-    // These methods handle the pressing and releasing of the keys to allow you to
-    // click the circles
     public void mousePressed() {
         if (anyMapStarted) {
             clickStuff();
         } else {
             if (mouseDistance(1100, 375) < 150) {
-                if (GravityFallsMap == false && anyMapStarted == false && InstructionsOnScreen == false) {
-                    GravityFallsMap = true; 
+                if (GravityFallsMapHard == false && anyMapStarted == false && InstructionsOnScreen == false) {
+                    GravityFallsMapHard = true;
                     anyMapStarted = true;
                     songLength = 40;
                     previousFrameTime = millis();
@@ -445,15 +569,26 @@ public class App extends PApplet {
                     mapCombo = 91;
                 }
             }
+            if (mouseDistance(400, 375) < 150) {
+                if (GravityFallsMapEasy == false && anyMapStarted == false && InstructionsOnScreen == false) {
+                    GravityFallsMapEasy = true;
+                    anyMapStarted = true;
+                    songLength = 40;
+                    previousFrameTime = millis();
+                    bpm = 160;
+                    fpb = 3600 / 160f;
+                    AproachRate = 1;
+                    CircleSize = 125;
+                    mapCombo = 73;
+                }
+            }
             if (mouseDistance(750, 650) < 50) {
                 if (InstructionsOnScreen == false) {
                     InstructionsOnScreen = true;
-                } 
-                else{
+                } else {
                     InstructionsOnScreen = false;
                 }
-                    
-                
+
             }
         }
 
