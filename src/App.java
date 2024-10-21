@@ -554,9 +554,11 @@ public class App extends PApplet {
 
     public void mousePressed() {
         if (anyMapStarted) {
+            //if a map is started calls thw clicking function
             clickStuff();
         } else {
             if (mouseDistance(1100, 375) < 150) {
+                //sets up the maps based on which one you click on the menu.
                 if (GravityFallsMapHard == false && anyMapStarted == false && InstructionsOnScreen == false) {
                     GravityFallsMapHard = true;
                     anyMapStarted = true;
@@ -593,7 +595,7 @@ public class App extends PApplet {
         }
 
     }
-
+//relleased functions are for if you realese to early pn th emoving circles
     public void mouseReleased() {
         if (sliderClick) {
             sliderMulti = 1;
@@ -625,16 +627,19 @@ public class App extends PApplet {
 
     public void keyPressed() {
         if (key == 'z') {
+            //if a map is started calls thw clicking function
             clickStuff();
 
         }
 
         if (key == 'x') {
+            //if a map is started calls thw clicking function
             clickStuff();
 
         }
         if (key == CODED) {
             if (keyCode == UP) {
+                //if a map is started calls thw clicking function
                 clickStuff();
             }
         }
